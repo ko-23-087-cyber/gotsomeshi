@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Auth</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: -apple-system, sans-serif; display: flex; justify-content: center; padding-top: 50px; background: #f9f9f9; }
+        .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); width: 300px; text-align: center; }
+        button { width: 100%; padding: 12px; background: #3ecf8e; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #36b87d; }
+        .logout { background: #ff4d4d; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Вход в систему</h2>
+    <div id="login-ui">
+        <button onclick="signInWithGoogle()">Войти через Google</button>
+    </div>
+    <div id="user-ui" style="display:none;">
+        <p>Привет!</p>
+        <p align="center"><strong id="email-label"></strong></p>
+        <button class="logout" onclick="signOut()">Выйти</button>
+    </div>
+</div>
+
+<script>
+    // Твои настройки подставлены автоматически
+    const SUPABASE_URL = 'https://mywcivphtqzlbhvfejzw.supabase.co'
+    const SUPABASE_ANON_KEY = 'sb_publishable_ElUCO5cEi4VzgEOOsrxSbQ_Mz8EQqHJ'
+
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+    async function signInWithGoogle() {
+        const { error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: window.location.origin
+            }
+        })
+        if (error) alert('Ошибка: ' + error.message)
+    }
+
+    async function signOut() {
+        await supabase.auth.signOut()
+        window.location.reload()
+    }
+
+    // Проверка сессии при загрузке
+    supabase.auth.onAuthStateChange((event, session) => {
+        if (session) {
+            document.getElementById('login-ui').style.display = 'none'
+            document.getElementById('user-ui').style.display = 'block'
+            document.getElementById('email-label').innerText = session.user.email
+        } else {
+            document.getElementById('login-ui').style.display = 'block'
+            document.getElementById('user-ui').style.display = 'none'
+        }
+    })
+</script>
+
+</body>
+</html>
