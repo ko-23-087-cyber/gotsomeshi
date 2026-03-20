@@ -28,39 +28,38 @@
 </div>
 
 <script>
-    // Твои настройки подставлены автоматически
+    // 1. Указываем данные (проверь, чтобы они были твои)
     const SUPABASE_URL = 'https://mywcivphtqzlbhvfejzw.supabase.co'
     const SUPABASE_ANON_KEY = 'sb_publishable_ElUCO5cEi4VzgEOOsrxSbQ_Mz8EQqHJ'
 
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    // 2. Создаем клиент Supabase (ТОЛЬКО ОДИН РАЗ)
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
+    // 3. Функция для кнопки
     async function signInWithGoogle() {
-        const { error } = await supabase.auth.signInWithOAuth({
+        console.log("Кнопка нажата!");
+        const { error } = await supabaseClient.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: window.location.origin
+                redirectTo: 'https://ko-23-087-cyber.github.io/gotsomeshi'
             }
         })
-        if (error) alert('Ошибка: ' + error.message)
+        if (error) console.error('Ошибка:', error.message)
     }
 
-    async function signOut() {
-        await supabase.auth.signOut()
-        window.location.reload()
-    }
-
-    // Проверка сессии при загрузке
-    supabase.auth.onAuthStateChange((event, session) => {
+    // 4. Логика отображения (залогинен/нет)
+    supabaseClient.auth.onAuthStateChange((event, session) => {
         if (session) {
             document.getElementById('login-ui').style.display = 'none'
             document.getElementById('user-ui').style.display = 'block'
             document.getElementById('email-label').innerText = session.user.email
-        } else {
-            document.getElementById('login-ui').style.display = 'block'
-            document.getElementById('user-ui').style.display = 'none'
         }
     })
-</script>
 
+    async function signOut() {
+        await supabaseClient.auth.signOut()
+        window.location.reload()
+    }
+</script>
 </body>
 </html>
